@@ -1,5 +1,3 @@
-from core.map import GameMap
-from entities.player import Player
 from game.app import App
 
 # def main():

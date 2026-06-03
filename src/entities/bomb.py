@@ -16,11 +16,13 @@ class Bomb:
         self.occupy_position()
         self.get_expansion_ranges()
 
+        self.fire_coords = set()
+
     def occupy_position(self):
         self.state = "TICKING"
 
         self.current_radius = 1
-        self.map.obstruct_pixel(self.position[0], self.position[1])
+        # self.map.obstruct_pixel(self.position[0], self.position[1])
 
     def desoccupy_position(self):
         self.map.desobstruct_pixel(self.position[0], self.position[1])
@@ -33,23 +35,17 @@ class Bomb:
         x, y = self.position
         r = self.current_radius
         
-        self.map.lit_pixel(x, y)
+        self.fire_coords.add((x,y))
         
-        if r <= self.ranges[0]: self.map.lit_pixel(x + r, y)
-        if r <= self.ranges[1]: self.map.lit_pixel(x, y + r)
-        if r <= self.ranges[2]: self.map.lit_pixel(x - r, y)
-        if r <= self.ranges[3]: self.map.lit_pixel(x, y - r)
+        if r <= self.ranges[0]: self.fire_coords.add((x + r, y))
+        if r <= self.ranges[1]: self.fire_coords.add((x, y + r))
+        if r <= self.ranges[2]: self.fire_coords.add((x - r, y))
+        if r <= self.ranges[3]: self.fire_coords.add((x, y - r))
         
         self.current_radius += 1
 
     def clear_fire(self):
-        x, y = self.position
-        self.map.unlit_pixel(x, y)
-        
-        for r in range(1, self.ranges[0] + 1): self.map.unlit_pixel(x + r, y)
-        for r in range(1, self.ranges[1] + 1): self.map.unlit_pixel(x, y + r)
-        for r in range(1, self.ranges[2] + 1): self.map.unlit_pixel(x - r, y)
-        for r in range(1, self.ranges[3] + 1): self.map.unlit_pixel(x, y - r)
+        self.fire_coords.clear()
 
     def get_expansion_ranges(self):
         self.ranges = [self.explosion_site, self.explosion_site, self.explosion_site, self.explosion_site]
@@ -80,22 +76,6 @@ class Bomb:
             if now - self.last_update_time >= 50:
                 self.explode()
                 self.last_update_time = now 
-
-            if now - self.last_update_time >= 50:
-                if self.current_radius < self.explosion_site:
-                    x, y = self.position
-                    r = self.current_radius
-                    
-                    self.map.lit_pixel(x + r, y)
-                    self.map.lit_pixel(x - r, y)
-                    self.map.lit_pixel(x, y + r)
-                    self.map.lit_pixel(x, y - r)
-                    
-                    self.current_radius += 1
-                    self.last_update_time = now
-                else:
-                    self.state = "LINGERING"
-                    self.last_update_time = now
 
         elif self.state == "LINGERING":
             if now - self.last_update_time >= 1000:

@@ -3,21 +3,23 @@ from core.map import GameMap
 from .bomb import Bomb
 
 class Player:
-    def __init__(self, map:GameMap, position:tuple[int,int], team:int):
-        self.map:GameMap = map
-
-        self.position = position
+    def __init__(self, map:GameMap, position:tuple[int,int], team:int, name:str):
+        self.name = name
         self.team = team
+
+        self.map:GameMap = map
+        self.position = position
+
+        self.face_to_dir(0,1)
+        self.set_color()
 
         self.lives: bool = True
         self.hp:int = 5
 
-        self.spawn()
-        self.face_to_dir(0,1)
-
     def spawn(self):
         (x, y) = self.position
         if self.map.is_valid_pixel(x,y):
+            self.position = self.position
             # self.map.obstruct_pixel(x,y)
             pass
 
@@ -28,12 +30,12 @@ class Player:
         target_x = self.position[0] + self.facing_dir[0]
         target_y = self.position[1] + self.facing_dir[1]
 
-        return target_x,target_y
+        return (target_x,target_y)
 
     def walk_to_dir(self):
         target_pos = self.get_target_postion()
 
-        target_px = self.map.get_pixel(target_pos)
+        target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
         if target_px.obstructed == True:
             return
@@ -42,10 +44,9 @@ class Player:
             # self.map.desobstruct_pixel(self.position)
             self.position = target_pos
             
-    def get_damaged(self):
-        current_px = self.map.get_pixel(self.position)
-        if current_px.burning == True:
-            self.hp -= 1
+    def get_damage(self, damage:int):
+        self.hp -= damage
+        print("Damaged!")
 
         if self.hp == 0: self.lives = False
 
@@ -53,7 +54,15 @@ class Player:
         target_pos = self.get_target_postion()
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
-        if target_px.obstructed or target_px.burning:
+        if target_px.obstructed:
             return None
         else:
             return Bomb(self, target_pos, 5, 1)
+        
+    def set_color(self):
+        if self.team == 1:
+            self.color = (0,0,255)
+        elif self.team == 2:
+            self.color = (255,0,0)
+        else:
+            print("Invalid team!")

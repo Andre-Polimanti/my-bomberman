@@ -1,9 +1,10 @@
 import pygame
 
 from core.map import GameMap
+from game.managers.events.keyboard_events import KeyboardEvents
 
-from entities.player import Player
-from entities.bomb import Bomb
+from .managers.entities.bomb_manager import BombManager
+from .managers.entities.player_manager import PlayerManager
 
 class App:
     def __init__(self):
@@ -18,30 +19,35 @@ class App:
 
         self.size = self.width, self.height
 
-        self.active_bombs:list[Bomb] = []
- 
+        self.player_manager = PlayerManager()
+        self.bomb_manager = BombManager()
+
+        self.keyboard_events = KeyboardEvents(self)
+        
+        self.player_manager.create_player(self.map,(self.map.width//2, 1), 1, "Me")
+        self.bomb_manager.create_bomb(self.player_manager.players[0])
+        self.player_manager.players[0].face_to_dir(1,0)
+        self.bomb_manager.create_bomb(self.player_manager.players[0])
+
     def on_init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode(self.size, pygame.DOUBLEBUF)
         self._running = True
-
-        self.player_1:Player = Player(self.map, (self.map.width//2, 2), 1)
-        self.player_2:Player = Player(self.map, (self.map.width//2, self.map.height-2), 2)
-
-        kaboom = self.player_1.place_bomb()
-        if kaboom:
-            self.active_bombs.append(kaboom)
  
     def on_event(self, event):
         if event.type == pygame.QUIT:
             self._running = False
+        elif event.type == pygame.KEYDOWN:
+            self.keyboard_events.handle_keydown(event)
             
     def on_loop(self):
-        self.manage_bombs()
+        self.bomb_manager.manage_bombs()
+        self.keyboard_events.handle_holded_keys()
         pass
         
     def on_render(self):
         self._display_surf.fill((0, 0, 0))
+        active_fires = self.bomb_manager.get_all_fire_coords()
 
         for x in range(self.map.width):
             for y in range(self.map.height):
@@ -50,18 +56,36 @@ class App:
                 
                 if pixel.obstructed:
                     color = (128, 128, 128)
-                elif pixel.burning:
+
+                elif (x, y) in active_fires:
                     color = (255, 69, 0)
+
                 else:
                     color = (34, 139, 34)
-
-                if (x,y) == self.player_1.position:
-                    color = (0,0,255)
-                elif (x,y) == self.player_2.position:
-                    color = (255,0,0)
                 
-                pygame.draw.rect(self._display_surf, color, rect)                
+                for player in self.player_manager.players:
+                    if (x,y) == player.position:
+                        color = player.color
+                for bomb in self.bomb_manager.active_bombs:
+                    if (x,y) == bomb.position and bomb.state == "TICKING":
+                        color = (0,0,0)
+                
+                pygame.draw.rect(self._display_surf, color, rect)          
                 pygame.draw.rect(self._display_surf, (20, 20, 20), rect, 1)
+
+                for player in self.player_manager.players:
+                    if (x, y) == player.position:
+                        cx = x * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
+                        cy = y * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
+                        
+                        dx, dy = player.facing_dir
+                        
+                        tip = (cx + dx * 15, cy + dy * 15)
+                        
+                        left_base = (cx + dy * 8, cy - dx * 8)
+                        right_base = (cx - dy * 8, cy + dx * 8)
+                        
+                        pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
         pygame.display.flip()
         
@@ -82,13 +106,4 @@ class App:
             clock.tick(60)
             
         self.on_cleanup()
-
-    def manage_bombs(self):
-        for bomb in self.active_bombs:
-            bomb.life_and_death()
-            
-        for bomb in self.active_bombs:
-            if bomb.state == "DEAD":
-                self.active_bombs.remove(bomb)
-
-        
+    

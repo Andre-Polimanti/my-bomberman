@@ -35,15 +35,11 @@ class GameMap:
     def obstruct_pixel(self, x:int, y:int):
         if self.is_valid_pixel(x,y):
             self.pixels[x][y].obstructed = True
-
     def desobstruct_pixel(self, x:int, y:int):
         if self.is_valid_pixel(x,y):
             self.pixels[x][y].obstructed = False
 
-    def lit_pixel(self, x:int, y:int):
-        if self.is_valid_pixel(x,y):
-            self.pixels[x][y].burning = True
-
-    def unlit_pixel(self, x:int, y:int):
-        if self.is_valid_pixel(x,y):
-            self.pixels[x][y].burning = False
+    def occupy_pixel(self, x:int, y:int):
+        self.pixel[x][y].occupied = True
+    def deoccupy_pixel(self, x:int, y:int):
+        self.pixels[x][y].occupied = False
