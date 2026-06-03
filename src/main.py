@@ -1,15 +1,17 @@
 from core.map import GameMap
 from entities.player import Player
+from game.app import App
+
+# def main():
+#     side = 19
+#     map = GameMap(side)
+#     x, y = (side) // 2, 1
+#     player = Player(map, [x,y], 1)
+#     player.place_bomb()
+#     map.print_map([x,y])
+# main()
 
 def main():
-    side = 19
-    map = GameMap(side)
-    x = (side) // 2
-    y = 1
-    player = Player(map, [x,y], 1)
-
-    player.place_bomb()
-
-    map.print_map([x,y])
-
+    app = App()
+    app.on_execute()
 main()

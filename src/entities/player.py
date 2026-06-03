@@ -16,9 +16,10 @@ class Player:
         self.face_to_dir(0,1)
 
     def spawn(self):
-        x, y = self.position
+        (x, y) = self.position
         if self.map.is_valid_pixel(x,y):
-            self.map.obstruct_pixel(x,y)
+            # self.map.obstruct_pixel(x,y)
+            pass
 
     def face_to_dir(self, x:int,y:int):
         self.facing_dir = (x,y)
@@ -37,8 +38,8 @@ class Player:
         if target_px.obstructed == True:
             return
         else:
-            self.map.obstruct_pixel(target_pos)
-            self.map.desobstruct_pixel(self.position)
+            # self.map.obstruct_pixel(target_pos)
+            # self.map.desobstruct_pixel(self.position)
             self.position = target_pos
             
     def get_damaged(self):
@@ -53,6 +54,6 @@ class Player:
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
         if target_px.obstructed or target_px.burning:
-            return
+            return None
         else:
-            Bomb(self, target_pos, 5, 1)
+            return Bomb(self, target_pos, 5, 1)
