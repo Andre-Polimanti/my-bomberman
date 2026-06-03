@@ -40,6 +40,6 @@ class GameMap:
             self.pixels[x][y].obstructed = False
 
     def occupy_pixel(self, x:int, y:int):
-        self.pixel[x][y].occupied = True
+        self.pixels[x][y].occupied = True
     def deoccupy_pixel(self, x:int, y:int):
         self.pixels[x][y].occupied = False

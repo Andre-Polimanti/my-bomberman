@@ -8,7 +8,7 @@ class Player:
         self.team = team
 
         self.map:GameMap = map
-        self.position = position
+        self.spawn(position)
 
         self.face_to_dir(0,1)
         self.set_color()
@@ -16,11 +16,11 @@ class Player:
         self.lives: bool = True
         self.hp:int = 5
 
-    def spawn(self):
-        (x, y) = self.position
+    def spawn(self, position):
+        x,y = position
         if self.map.is_valid_pixel(x,y):
-            self.position = self.position
-            # self.map.obstruct_pixel(x,y)
+            self.position = position
+            self.map.occupy_pixel(x,y)
             pass
 
     def face_to_dir(self, x:int,y:int):
@@ -37,11 +37,11 @@ class Player:
 
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
-        if target_px.obstructed == True:
+        if target_px.obstructed or target_px.occupied:
             return
         else:
-            # self.map.obstruct_pixel(target_pos)
-            # self.map.desobstruct_pixel(self.position)
+            self.map.occupy_pixel(target_pos[0], target_pos[1])
+            self.map.deoccupy_pixel(self.position[0], self.position[1])
             self.position = target_pos
             
     def get_damage(self, damage:int):
@@ -54,7 +54,7 @@ class Player:
         target_pos = self.get_target_postion()
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
-        if target_px.obstructed:
+        if target_px.obstructed or target_px.occupied:
             return None
         else:
             return Bomb(self, target_pos, 5, 1)

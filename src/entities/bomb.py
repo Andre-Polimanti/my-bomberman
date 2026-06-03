@@ -22,10 +22,10 @@ class Bomb:
         self.state = "TICKING"
 
         self.current_radius = 1
-        # self.map.obstruct_pixel(self.position[0], self.position[1])
+        self.map.occupy_pixel(self.position[0], self.position[1])
 
     def desoccupy_position(self):
-        self.map.desobstruct_pixel(self.position[0], self.position[1])
+        self.map.deoccupy_pixel(self.position[0], self.position[1])
     
     def explode(self):
         if self.current_radius > max(self.ranges):

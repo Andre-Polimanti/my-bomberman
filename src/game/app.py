@@ -25,9 +25,8 @@ class App:
         self.keyboard_events = KeyboardEvents(self)
         
         self.player_manager.create_player(self.map,(self.map.width//2, 1), 1, "Me")
-        self.bomb_manager.create_bomb(self.player_manager.players[0])
-        self.player_manager.players[0].face_to_dir(1,0)
-        self.bomb_manager.create_bomb(self.player_manager.players[0])
+        self.player_manager.create_player(self.map,(self.map.width//2, self.map.height-2), 2, "Other")
+        
 
     def on_init(self):
         pygame.init()
@@ -45,6 +44,24 @@ class App:
         self.keyboard_events.handle_holded_keys()
         pass
         
+    def on_cleanup(self):
+        pygame.quit()
+ 
+    def on_execute(self):
+        if self.on_init() == False:
+            self._running = False
+ 
+        clock = pygame.time.Clock()
+ 
+        while self._running:
+            for event in pygame.event.get():
+                self.on_event(event)
+            self.on_loop()
+            self.on_render()
+            clock.tick(60)
+            
+        self.on_cleanup()
+    
     def on_render(self):
         self._display_surf.fill((0, 0, 0))
         active_fires = self.bomb_manager.get_all_fire_coords()
@@ -88,22 +105,3 @@ class App:
                         pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
         pygame.display.flip()
-        
-    def on_cleanup(self):
-        pygame.quit()
- 
-    def on_execute(self):
-        if self.on_init() == False:
-            self._running = False
- 
-        clock = pygame.time.Clock()
- 
-        while self._running:
-            for event in pygame.event.get():
-                self.on_event(event)
-            self.on_loop()
-            self.on_render()
-            clock.tick(60)
-            
-        self.on_cleanup()
-    
