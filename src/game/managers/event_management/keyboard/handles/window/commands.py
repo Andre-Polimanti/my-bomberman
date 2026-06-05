@@ -1,9 +1,11 @@
 import pygame
 
+TYPE = "WINDOW_COMMAND"
+
 def on_keydown(event):
     if event.key == pygame.K_ESCAPE:
-        return {"type": "WINDOW_COMMAND", "action": "CLOSE"}
+        return {"type": TYPE, "action": "CLOSE"}
     if event.key == pygame.K_m:
-        return {"type": "WINDOW_COMMAND", "action": "MINIMIZE"}
+        return {"type": TYPE, "action": "MINIMIZE"}
     else:
         pass

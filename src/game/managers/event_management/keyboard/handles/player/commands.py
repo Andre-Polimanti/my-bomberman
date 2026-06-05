@@ -1,6 +1,7 @@
 import pygame
 
 MOVE_DELAY = 150
+TYPE = "PLAY"
 
 def on_keydown(player, player_controls, event):
     if event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]: return
@@ -23,7 +24,7 @@ def on_keydown(player, player_controls, event):
         target_pos = p.get_valid_target()
 
         if target_pos:
-            return {"type": "PLAY", "action": "BOMBING", "player": p, "pos": target_pos}
+            return {"type": TYPE, "action": "BOMBING", "player": p, "pos": target_pos}
 
 def on_keyhold(player, player_controls):
     p = player
