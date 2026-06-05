@@ -1,7 +1,7 @@
 import pygame
 
 p1_controls = {
-    "keys": {
+    "move_keys": {
     pygame.K_LEFT: (-1, 0),
     pygame.K_RIGHT: (1, 0),
     pygame.K_UP: (0, -1),
@@ -12,7 +12,7 @@ p1_controls = {
     "last_time": pygame.time.get_ticks()
 }
 p2_controls = {
-    "keys": {
+    "move_keys": {
         pygame.K_a: (-1, 0),
         pygame.K_d: (1, 0),
         pygame.K_w: (0, -1),

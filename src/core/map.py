@@ -27,7 +27,6 @@ class GameMap:
 
     def is_valid_pixel(self, x:int, y:int):
         return 0 <= x < self.width and 0 <= y < self.height
-
     def get_pixel(self, x:int,y:int):
         if self.is_valid_pixel(x,y):
             return self.pixels[x][y]

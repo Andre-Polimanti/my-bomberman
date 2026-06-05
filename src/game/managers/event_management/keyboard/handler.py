@@ -13,7 +13,7 @@ class KeyboardEvents:
         if not self.players: return
 
         actions = []
-        
+    
         act = player_on_keydown(self.players[0], p1_controls, event)
         if act: actions.append(act)
         act = player_on_keydown(self.players[1], p2_controls, event)

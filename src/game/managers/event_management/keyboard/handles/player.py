@@ -3,13 +3,13 @@ import pygame
 move_delay = 150
 
 def player_on_keydown(player, player_controls, event):
-    if event.key not in player_controls["keys"] and event.key != player_controls["bomb_key"]: return
+    if event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]: return
     
     p = player
     controls = player_controls
 
-    if event.key in controls["keys"]:
-        dx, dy = controls["keys"][event.key]
+    if event.key in controls["move_keys"]:
+        dx, dy = controls["move_keys"][event.key]
         
         p.face_to_dir(dx, dy)
         
@@ -32,7 +32,7 @@ def player_on_keyhold(player, player_controls):
     now = pygame.time.get_ticks()
     keys = pygame.key.get_pressed()
 
-    for key in controls["keys"]:
+    for key in controls["move_keys"]:
         if keys[key]: 
             if key == controls["last_instr"]:
                 if now - controls["last_time"] >= move_delay:
