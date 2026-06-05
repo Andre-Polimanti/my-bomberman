@@ -1,6 +1,6 @@
 from pygame.event import Event 
 
-from ....configs.players_controls import *
+from ....configs.player_controls import *
 from .handles.player import player_on_keydown, player_on_keyhold
 
 class KeyboardEvents:

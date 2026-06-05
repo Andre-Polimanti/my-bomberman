@@ -3,8 +3,8 @@ import pygame
 from core.map import GameMap
 from game.managers.event_management.keyboard.handler import KeyboardEvents
 
-from .managers.entitie_management.bomb_manager import BombManager
-from .managers.entitie_management.player_manager import PlayerManager
+from .managers.entity_management.bomb_manager import BombManager
+from .managers.entity_management.player_manager import PlayerManager
 
 class App:
     def __init__(self):
