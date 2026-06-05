@@ -31,33 +31,29 @@ class Player:
         target_y = self.position[1] + self.facing_dir[1]
 
         return (target_x,target_y)
-
-    def walk_to_dir(self):
-        target_pos = self.get_target_postion()
-
-        target_px = self.map.get_pixel(target_pos[0], target_pos[1])
-
-        if target_px.obstructed or target_px.occupied:
-            return
-        else:
-            self.map.occupy_pixel(target_pos[0], target_pos[1])
-            self.map.deoccupy_pixel(self.position[0], self.position[1])
-            self.position = target_pos
-            
-    def get_damage(self, damage:int):
-        self.hp -= damage
-        print("Damaged!")
-
-        if self.hp == 0: self.lives = False
-
-    def place_bomb(self):
+    
+    def get_valid_target(self):
         target_pos = self.get_target_postion()
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
         if target_px.obstructed or target_px.occupied:
             return None
         else:
-            return Bomb(self, target_pos, 5, 1)
+            return target_pos
+
+    def walk(self):
+        px = self.get_valid_target()
+
+        if px:
+            self.map.occupy_pixel(px[0], px[1])
+            self.map.deoccupy_pixel(self.position[0], self.position[1])
+            self.position = px
+            
+    def get_damage(self, damage:int):
+        self.hp -= damage
+        print("Damaged!")
+
+        if self.hp == 0: self.lives = False
         
     def set_color(self):
         if self.team == 1:

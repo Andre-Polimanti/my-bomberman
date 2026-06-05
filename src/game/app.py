@@ -1,7 +1,7 @@
 import pygame
 
 from core.map import GameMap
-from game.managers.events.keyboard_events import KeyboardEvents
+from game.managers.events.keyboard.handler import KeyboardEvents
 
 from .managers.entities.bomb_manager import BombManager
 from .managers.entities.player_manager import PlayerManager
@@ -37,11 +37,15 @@ class App:
         if event.type == pygame.QUIT:
             self._running = False
         elif event.type == pygame.KEYDOWN:
-            self.keyboard_events.handle_keydown(event)
+            actions =  self.keyboard_events.handle_keydown(event)
+
+            for act in actions:
+                if act["action"] == "BOMB":
+                    self.bomb_manager.create_bomb(act["player"], act["pos"])
             
     def on_loop(self):
         self.bomb_manager.manage_bombs()
-        self.keyboard_events.handle_holded_keys()
+        self.keyboard_events.handle_keyhold()
         pass
         
     def on_cleanup(self):

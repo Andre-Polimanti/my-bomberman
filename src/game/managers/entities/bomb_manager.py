@@ -4,10 +4,12 @@ class BombManager:
     def __init__(self):
         self.active_bombs:list[Bomb] = []
 
-    def create_bomb(self, player):
-        bomb = player.place_bomb() 
-        if bomb:
-            self.active_bombs.append(bomb)
+    def create_bomb(self, player, position):
+        explosion_site = 5
+        damage = 1
+
+        bomb = Bomb(player, position, explosion_site, damage)
+        self.active_bombs.append(bomb)
 
     def get_all_fire_coords(self):
         all_fire = set()

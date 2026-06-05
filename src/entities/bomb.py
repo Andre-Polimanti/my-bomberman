@@ -5,7 +5,7 @@ class Bomb:
     def __init__(self, bomber, position:tuple[int,int], explosion_site:int, damage:int):
         self.map: GameMap = bomber.map
         self.team:int = bomber.team
-        self.position:tuple[int,int] = position
+        self.position = position
 
         self.explosion_site:int = explosion_site
         self.damage:int = damage
