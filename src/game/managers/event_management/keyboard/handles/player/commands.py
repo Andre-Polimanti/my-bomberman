@@ -1,8 +1,8 @@
 import pygame
 
-move_delay = 150
+MOVE_DELAY = 150
 
-def player_on_keydown(player, player_controls, event):
+def on_keydown(player, player_controls, event):
     if event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]: return
     
     p = player
@@ -25,7 +25,7 @@ def player_on_keydown(player, player_controls, event):
         if target_pos:
             return {"action": "BOMB", "player": p, "pos": target_pos}
 
-def player_on_keyhold(player, player_controls):
+def on_keyhold(player, player_controls):
     p = player
     controls = player_controls
 
@@ -35,7 +35,7 @@ def player_on_keyhold(player, player_controls):
     for key in controls["move_keys"]:
         if keys[key]: 
             if key == controls["last_instr"]:
-                if now - controls["last_time"] >= move_delay:
+                if now - controls["last_time"] >= MOVE_DELAY:
                     p.walk()
                     controls["last_time"] = now
                     break

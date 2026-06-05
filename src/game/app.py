@@ -10,42 +10,46 @@ class App:
     def __init__(self):
         self._running = False
         self._display_surf = None
-        
+
         self.map = GameMap(15)
+        self.BLOCK_SIZE = 60
         
-        self.BLOCK_SIZE = 40 
         self.width = self.map.width * self.BLOCK_SIZE
         self.height = self.map.height * self.BLOCK_SIZE
 
         self.size = self.width, self.height
 
-        self.player_manager = PlayerManager()
-        self.bomb_manager = BombManager()
-
-        self.keyboard_events = KeyboardEvents(self)
-        
-        self.player_manager.create_player(self.map,(self.map.width//2, 1), 1, "Me")
-        self.player_manager.create_player(self.map,(self.map.width//2, self.map.height-2), 2, "Other")
-        
-
     def on_init(self):
+        self.setup()
         pygame.init()
-        self._display_surf = pygame.display.set_mode(self.size, pygame.DOUBLEBUF)
+        
+        pygame.display.set_caption("My Bomberman")
+        self._display_surf = pygame.display.set_mode(
+            self.size, 
+            pygame.DOUBLEBUF
+            )
         self._running = True
- 
+
     def on_event(self, event):
         if event.type == pygame.QUIT:
             self._running = False
         elif event.type == pygame.KEYDOWN:
-            actions =  self.keyboard_events.handle_keydown(event)
-
-            for act in actions:
-                if act["action"] == "BOMB":
-                    self.bomb_manager.create_bomb(act["player"], act["pos"])
-            
+            actions =  self.keyboard_events.on_keydown(event)
+            if actions:
+                for act in actions:
+                    if act["action"] == "CLOSE_WINDOW":
+                        self._running = False
+                    elif act["action"] == "RESTART":
+                        self.setup()
+                        pass
+                    elif act["action"] == "BOMB":
+                        self.bomb_manager.create_bomb(act["player"], act["pos"])
+                    else:
+                        pass
+                
     def on_loop(self):
         self.bomb_manager.manage_bombs()
-        self.keyboard_events.handle_keyhold()
+        self.keyboard_events.on_keyhold()
         pass
         
     def on_cleanup(self):
@@ -77,10 +81,8 @@ class App:
                 
                 if pixel.obstructed:
                     color = (128, 128, 128)
-
                 elif (x, y) in active_fires:
                     color = (255, 69, 0)
-
                 else:
                     color = (34, 139, 34)
                 
@@ -109,3 +111,22 @@ class App:
                         pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
         pygame.display.flip()
+
+    def setup(self):
+        self.map = GameMap(15)
+
+        self.player_manager = PlayerManager()
+        self.bomb_manager = BombManager()
+
+        self.create_players()
+
+        self.keyboard_events = KeyboardEvents(self)
+
+    def create_players(self):
+        map = self.map
+
+        p1_pos = (map.width//2, 1)
+        p2_pos = (map.width//2, map.height-2)
+
+        self.player_manager.create_player(map, p1_pos, 1, "Bluey")
+        self.player_manager.create_player(map, p2_pos, 2, "Redy")

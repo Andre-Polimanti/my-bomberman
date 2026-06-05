@@ -1,28 +1,19 @@
 from pygame.event import Event 
 
-from ....configs.player_controls import *
-from .handles.player import player_on_keydown, player_on_keyhold
+from .handles.player.router import player_on_keydown, player_on_keyhold
+from .handles.window.router import window_on_keydown
 
 class KeyboardEvents:
     def __init__(self, app):
-        self.players = app.player_manager.players
+        self.app = app
+        self.players = self.app.player_manager.players
 
-        self.move_delay = 150
+    def on_keydown(self, event:Event):
+        player_cmds = player_on_keydown(self.players, event)
+        window_cmds = window_on_keydown(event)
+        
+        cmds = [*window_cmds, *player_cmds]
+        return cmds
 
-    def handle_keydown(self, event: Event):
-        if not self.players: return
-
-        actions = []
-    
-        act = player_on_keydown(self.players[0], p1_controls, event)
-        if act: actions.append(act)
-        act = player_on_keydown(self.players[1], p2_controls, event)
-        if act: actions.append(act)
-
-        return actions
-
-    def handle_keyhold(self):
-        if not self.players: return
-
-        player_on_keyhold(self.players[0], p1_controls)
-        player_on_keyhold(self.players[1], p2_controls)
+    def on_keyhold(self):
+        player_on_keyhold(self.players)
