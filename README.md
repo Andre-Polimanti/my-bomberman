@@ -5,7 +5,7 @@ You should clone this repository into your machine, using the command:
 ```script
 git clone https://github.com/Andre-Polimanti/my-bomberman.git
 ```
-Then, create a local virtual enviroment, and activate it for this, run:
+Then, to create a local virtual enviroment and activate it run:
 ```script
 python -m venv venv
 source venv/bin/activate
