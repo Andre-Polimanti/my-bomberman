@@ -1,10 +1,10 @@
 import pygame
 
 from core.map import GameMap
-from game.managers.events.keyboard.handler import KeyboardEvents
+from game.managers.event_management.keyboard.handler import KeyboardEvents
 
-from .managers.entities.bomb_manager import BombManager
-from .managers.entities.player_manager import PlayerManager
+from .managers.entitie_management.bomb_manager import BombManager
+from .managers.entitie_management.player_manager import PlayerManager
 
 class App:
     def __init__(self):

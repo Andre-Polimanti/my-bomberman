@@ -1,7 +1,6 @@
 from pygame.event import Event 
 
 from ....configs.players_controls import *
-
 from .handles.player import player_on_keydown, player_on_keyhold
 
 class KeyboardEvents:
@@ -17,7 +16,6 @@ class KeyboardEvents:
         
         act = player_on_keydown(self.players[0], p1_controls, event)
         if act: actions.append(act)
-
         act = player_on_keydown(self.players[1], p2_controls, event)
         if act: actions.append(act)
 
