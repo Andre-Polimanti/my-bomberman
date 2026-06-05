@@ -23,7 +23,7 @@ def on_keydown(player, player_controls, event):
         target_pos = p.get_valid_target()
 
         if target_pos:
-            return {"action": "BOMB", "player": p, "pos": target_pos}
+            return {"type": "PLAY", "action": "BOMBING", "player": p, "pos": target_pos}
 
 def on_keyhold(player, player_controls):
     p = player

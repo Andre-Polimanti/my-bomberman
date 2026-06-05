@@ -37,16 +37,21 @@ class App:
             actions =  self.keyboard_events.on_keydown(event)
             if actions:
                 for act in actions:
-                    if act["action"] == "CLOSE_WINDOW":
-                        self._running = False
-                    elif act["action"] == "RESTART":
-                        self.setup()
-                        pass
-                    elif act["action"] == "BOMB":
-                        self.bomb_manager.create_bomb(act["player"], act["pos"])
-                    else:
-                        pass
-                
+                    match act["type"]:
+                        case "WINDOW_COMMAND":
+                            if act["action"] == "CLOSE":
+                                self._running = False
+                            if act["action"] == "MINIMIZE":
+                                pygame.display.iconify()
+
+                        case "GAME_COMMAND":
+                            if act["action"] == "RESTART":
+                                self.setup()
+                                
+                        case "PLAY":
+                            if act["action"] == "BOMBING":
+                                self.bomb_manager.create_bomb(act["player"], act["pos"])
+
     def on_loop(self):
         self.bomb_manager.manage_bombs()
         self.keyboard_events.on_keyhold()
