@@ -4,11 +4,8 @@ class BombManager:
     def __init__(self):
         self.active_bombs:list[Bomb] = []
 
-    def create_bomb(self, player, position):
-        explosion_site = 5
-        damage = 1
-
-        bomb = Bomb(player, position, explosion_site, damage)
+    def create_bomb(self, player, position, explosion_site:int):
+        bomb = Bomb(player, position, explosion_site)
         self.active_bombs.append(bomb)
 
     def get_all_fire_coords(self):
@@ -20,10 +17,9 @@ class BombManager:
     def manage_bombs(self):
         for bomb in self.active_bombs:
             bomb.life_and_death()
-            
+
         for bomb in self.active_bombs:
-            if bomb.state == "DEAD":
-                self.active_bombs.remove(bomb)
+                self._kill_bomb(bomb)
     
     def get_bomb_cords(self):
         cords = []
@@ -36,3 +32,7 @@ class BombManager:
             if bomb.position == (x,y):
                 return bomb
         return None
+    
+    def _kill_bomb(self, bomb):
+        if bomb.state == "DEAD":
+            self.active_bombs.remove(bomb)

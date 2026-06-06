@@ -6,6 +6,8 @@ from game.managers.event_management.keyboard.handler import KeyboardEvents
 from .managers.entity_management.bomb_manager import BombManager
 from .managers.entity_management.player_manager import PlayerManager
 
+BOMB_RANGE = 5
+
 class App:
     def __init__(self):
         self._running = False
@@ -18,6 +20,7 @@ class App:
         self.height = self.map.height * self.BLOCK_SIZE
 
         self.size = self.width, self.height
+        self.fires = None
 
     def on_init(self):
         self.setup()
@@ -47,14 +50,16 @@ class App:
                         case "GAME_COMMAND":
                             if act["action"] == "RESTART":
                                 self.setup()
-                                
+
                         case "PLAY":
                             if act["action"] == "BOMBING":
-                                self.bomb_manager.create_bomb(act["player"], act["pos"])
+                                self.bomb_manager.create_bomb(act["player"], act["pos"], BOMB_RANGE)
 
     def on_loop(self):
-        self.bomb_manager.manage_bombs()
         self.keyboard_events.on_keyhold()
+
+        self.bomb_manager.manage_bombs()
+        self.player_manager.manage_players(self.fires)
         pass
         
     def on_cleanup(self):
@@ -79,6 +84,8 @@ class App:
         self._display_surf.fill((0, 0, 0))
         active_fires = self.bomb_manager.get_all_fire_coords()
 
+        self.fires = active_fires
+
         for x in range(self.map.width):
             for y in range(self.map.height):
                 pixel = self.map.get_pixel(x, y)
@@ -92,8 +99,9 @@ class App:
                     color = (34, 139, 34)
                 
                 for player in self.player_manager.players:
-                    if (x,y) == player.position:
-                        color = player.color
+                    if player.lives:
+                        if (x,y) == player.position:
+                            color = player.color
                 for bomb in self.bomb_manager.active_bombs:
                     if (x,y) == bomb.position and bomb.state == "TICKING":
                         color = (0,0,0)
@@ -102,18 +110,19 @@ class App:
                 pygame.draw.rect(self._display_surf, (20, 20, 20), rect, 1)
 
                 for player in self.player_manager.players:
-                    if (x, y) == player.position:
-                        cx = x * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
-                        cy = y * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
-                        
-                        dx, dy = player.facing_dir
-                        
-                        tip = (cx + dx * 15, cy + dy * 15)
-                        
-                        left_base = (cx + dy * 8, cy - dx * 8)
-                        right_base = (cx - dy * 8, cy + dx * 8)
-                        
-                        pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
+                    if player.lives:
+                        if (x, y) == player.position:
+                            cx = x * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
+                            cy = y * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
+                            
+                            dx, dy = player.facing_dir
+                            
+                            tip = (cx + dx * 15, cy + dy * 15)
+                            
+                            left_base = (cx + dy * 8, cy - dx * 8)
+                            right_base = (cx - dy * 8, cy + dx * 8)
+                            
+                            pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
         pygame.display.flip()
 
@@ -130,8 +139,18 @@ class App:
     def create_players(self):
         map = self.map
 
-        p1_pos = (map.width//2, 1)
-        p2_pos = (map.width//2, map.height-2)
+        p1_pos = (1, 1)
+        p1 = self.player_manager.create_player(map, p1_pos, 1, "Bluey")
+        p1.face_to_dir(1,0)
 
-        self.player_manager.create_player(map, p1_pos, 1, "Bluey")
-        self.player_manager.create_player(map, p2_pos, 2, "Redy")
+        p2_pos = (map.width-2, map.height-2)
+        p2 = self.player_manager.create_player(map, p2_pos, 2, "Redy")
+        p2.face_to_dir(-1,0)
+
+        # p3_pos = (1, map.height-2)
+        # p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
+        # p3.face_to_dir(1,0)
+
+        # p4_pos = (map.width-2, 1)
+        # p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
+        # p4.face_to_dir(-1,0)

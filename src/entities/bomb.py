@@ -2,13 +2,12 @@ from pygame import time as t
 from core.map import GameMap
 
 class Bomb:
-    def __init__(self, bomber, position:tuple[int,int], explosion_site:int, damage:int):
+    def __init__(self, bomber, position:tuple[int,int], explosion_site:int):
         self.map: GameMap = bomber.map
         self.team:int = bomber.team
         self.position = position
 
         self.explosion_site:int = explosion_site
-        self.damage:int = damage
 
         self.creation_time = t.get_ticks()
         self.last_update_time = self.creation_time
@@ -31,12 +30,12 @@ class Bomb:
         if self.current_radius > max(self.ranges):
             self.state = "LINGERING"
             return
-
+        self.desoccupy_position()
+        
         x, y = self.position
         r = self.current_radius
         
         self.fire_coords.add((x,y))
-        
         if r <= self.ranges[0]: self.fire_coords.add((x + r, y))
         if r <= self.ranges[1]: self.fire_coords.add((x, y + r))
         if r <= self.ranges[2]: self.fire_coords.add((x - r, y))
@@ -49,7 +48,6 @@ class Bomb:
 
     def get_expansion_ranges(self):
         self.ranges = [self.explosion_site, self.explosion_site, self.explosion_site, self.explosion_site]
-
         to_go = [(1,0), (0,1), (-1,0), (0,-1)]
 
         for i, (dx,dy)in enumerate(to_go):
@@ -67,8 +65,6 @@ class Bomb:
         now = t.get_ticks()
 
         if ( self.state == "TICKING" ) and ( (now - self.creation_time) >= 2000 ):
-                self.desoccupy_position()
-
                 self.state = "EXPLODING"
                 self.last_update_time = now 
 

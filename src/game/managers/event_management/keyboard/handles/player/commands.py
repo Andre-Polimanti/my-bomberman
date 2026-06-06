@@ -4,7 +4,9 @@ MOVE_DELAY = 150
 TYPE = "PLAY"
 
 def on_keydown(player, player_controls, event):
-    if event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]: return
+    if (event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]) \
+    or player.lives == False:
+        return
     
     p = player
     controls = player_controls
@@ -29,6 +31,9 @@ def on_keydown(player, player_controls, event):
 def on_keyhold(player, player_controls):
     p = player
     controls = player_controls
+
+    if player.lives == False:
+        return
 
     now = pygame.time.get_ticks()
     keys = pygame.key.get_pressed()
