@@ -5,7 +5,6 @@ class PlayerManager:
         self.players:list[Player] = []
         self.the_living:list[Player] = []
 
-        self.winner = None
 
     def create_player(self, map, position:tuple[int,int], team:int, name:str):
         player = Player(map, position, team, name)
@@ -17,10 +16,12 @@ class PlayerManager:
         
     def manage_players(self, fires):
         for player in self.players:
-            player.life_and_death(fires)
-            if player.is_alive == False:
-                self._kill_zombie_player(player)
-
+            if player.is_alive:
+                player.life_and_death(fires)
+                if player.is_alive == False:
+                    self._kill_zombie_player(player)
+        return self._check_for_winner()
+    
     def get_player_on_pixel(self, x:int, y:int):
         for player in self.players:
             if (x,y) == player.position:
@@ -36,11 +37,8 @@ class PlayerManager:
     def _kill_zombie_player(self, player):
         if player in self.the_living:
             self.the_living.remove(player)
-            self._check_for_winner()
 
     def _check_for_winner(self):
         if len(self.the_living) == 1:
-            self.winner = self.the_living[0]
-            print("--------------------------------------")
-            print(f"{self.winner.name} is the winner!")
-            print("--------------------------------------")
+            return self.the_living[0]
+        return None

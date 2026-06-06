@@ -6,6 +6,8 @@ from game.managers.event_management.keyboard.handler import KeyboardEvents
 from .managers.entity_management.bomb_manager import BombManager
 from .managers.entity_management.player_manager import PlayerManager
 
+import time
+
 BOMB_RANGE = 5
 
 class App:
@@ -59,9 +61,10 @@ class App:
         self.keyboard_events.on_keyhold()
 
         self.bomb_manager.manage_bombs()
-        self.player_manager.manage_players(self.fires)
-        pass
-        
+        self.champion = self.player_manager.manage_players(self.fires)
+        if self.champion:
+            self._present_champion()
+
     def on_cleanup(self):
         pygame.quit()
  
@@ -128,6 +131,7 @@ class App:
 
     def setup(self):
         self.map = GameMap(15)
+        self.champion = None
 
         self.player_manager = PlayerManager()
         self.bomb_manager = BombManager()
@@ -147,10 +151,21 @@ class App:
         p2 = self.player_manager.create_player(map, p2_pos, 2, "Redy")
         p2.face_to_dir(-1,0)
 
-        # p3_pos = (1, map.height-2)
-        # p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
-        # p3.face_to_dir(1,0)
+        p3_pos = (1, map.height-2)
+        p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
+        p3.face_to_dir(1,0)
 
-        # p4_pos = (map.width-2, 1)
-        # p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
-        # p4.face_to_dir(-1,0)
+        p4_pos = (map.width-2, 1)
+        p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
+        p4.face_to_dir(-1,0)
+
+    def _present_champion(self): # Later, this will render a Game Over screen
+        print("--------------------------------------")
+        print(f"{self.champion.name} is the winner!")
+        print("--------------------------------------")
+
+        time.sleep(3)
+
+        self.setup()
+
+
