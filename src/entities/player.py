@@ -13,7 +13,7 @@ class Player:
         self.face_to_dir(0,1)
         self.set_color()
 
-        self.lives: bool = True
+        self.is_alive: bool = True
         self.hp:int = 5
 
     def spawn(self, position):
@@ -29,7 +29,7 @@ class Player:
     def face_to_dir(self, x:int,y:int):
         self.facing_dir = (x,y)
 
-    def get_target_postion(self):
+    def get_target_position(self):
         target_x = self.position[0] + self.facing_dir[0]
         target_y = self.position[1] + self.facing_dir[1]
 
@@ -39,7 +39,7 @@ class Player:
         if self.stunned:
             return
         
-        target_pos = self.get_target_postion()
+        target_pos = self.get_target_position()
         target_px = self.map.get_pixel(target_pos[0], target_pos[1])
 
         if target_px.obstructed or target_px.occupied:
@@ -78,7 +78,10 @@ class Player:
             return
 
         self.hp -= damage
-        print(f"Damaged! HP remaining: {self.hp}")
+        print("--------------------------------------")
+        print(f"{self.name} was hit!")
+        print(f"Remaining HP: {self.hp}")
+        print("--------------------------------------")
         
         if self.hp <= 0: 
             self._die()
@@ -87,8 +90,11 @@ class Player:
         self.stun_end_time = t.get_ticks() + stun_duration
     
     def _die(self):
-        self.lives = False
+        self.is_alive = False
         self.map.deoccupy_pixel(self.position[0], self.position[1])
+        print("--------------------------------------")
+        print(f"{self.name} has died!")
+        print("--------------------------------------")
 
     def life_and_death(self, fires):
         self._manage_stun()

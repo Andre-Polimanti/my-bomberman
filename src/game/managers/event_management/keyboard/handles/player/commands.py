@@ -5,7 +5,7 @@ TYPE = "PLAY"
 
 def on_keydown(player, player_controls, event):
     if (event.key not in player_controls["move_keys"] and event.key != player_controls["bomb_key"]) \
-    or player.lives == False:
+    or player.is_alive == False:
         return
     
     p = player
@@ -32,7 +32,7 @@ def on_keyhold(player, player_controls):
     p = player
     controls = player_controls
 
-    if player.lives == False:
+    if player.is_alive == False:
         return
 
     now = pygame.time.get_ticks()

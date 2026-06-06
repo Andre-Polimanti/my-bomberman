@@ -22,3 +22,5 @@ p2_controls = {
     "last_instr": None,
     "last_time": pygame.time.get_ticks()
 }
+
+player_controls = [p1_controls, p2_controls]

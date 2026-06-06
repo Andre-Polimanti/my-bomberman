@@ -4,10 +4,9 @@ from .commands import on_keydown, on_keyhold
 def player_on_keydown(players, event):
     actions = []
 
-    act = on_keydown(players[0], p1_controls, event)
-    if act: actions.append(act)
-    act = on_keydown(players[1], p2_controls, event)
-    if act: actions.append(act)
+    for i in range(len(players)):
+        act = on_keydown(players[i], player_controls[i], event)
+        if act: actions.append(act)
 
     return actions
 

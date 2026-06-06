@@ -99,7 +99,7 @@ class App:
                     color = (34, 139, 34)
                 
                 for player in self.player_manager.players:
-                    if player.lives:
+                    if player.is_alive:
                         if (x,y) == player.position:
                             color = player.color
                 for bomb in self.bomb_manager.active_bombs:
@@ -110,7 +110,7 @@ class App:
                 pygame.draw.rect(self._display_surf, (20, 20, 20), rect, 1)
 
                 for player in self.player_manager.players:
-                    if player.lives:
+                    if player.is_alive:
                         if (x, y) == player.position:
                             cx = x * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
                             cy = y * self.BLOCK_SIZE + self.BLOCK_SIZE // 2

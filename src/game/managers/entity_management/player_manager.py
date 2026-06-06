@@ -18,7 +18,7 @@ class PlayerManager:
     def manage_players(self, fires):
         for player in self.players:
             player.life_and_death(fires)
-            if player.lives == False:
+            if player.is_alive == False:
                 self._kill_zombie_player(player)
 
     def get_player_on_pixel(self, x:int, y:int):
@@ -41,3 +41,6 @@ class PlayerManager:
     def _check_for_winner(self):
         if len(self.the_living) == 1:
             self.winner = self.the_living[0]
+            print("--------------------------------------")
+            print(f"{self.winner.name} is the winner!")
+            print("--------------------------------------")
