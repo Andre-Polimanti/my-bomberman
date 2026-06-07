@@ -17,23 +17,27 @@ class App:
 
         self.map = GameMap(15)
         self.BLOCK_SIZE = 60
+        self.scoreboard = 180
         
         self.width = self.map.width * self.BLOCK_SIZE
         self.height = self.map.height * self.BLOCK_SIZE
 
-        self.size = self.width, self.height
+        self.size = self.width + self.scoreboard, self.height
         self.fires = None
 
     def on_init(self):
-        self.setup()
         pygame.init()
-        
         pygame.display.set_caption("My Bomberman")
         self._display_surf = pygame.display.set_mode(
             self.size, 
             pygame.DOUBLEBUF
             )
         self._running = True
+
+        pygame.font.init()
+        self.font = pygame.font.SysFont('arial', 20, bold = True)
+
+        self.setup()
 
     def on_event(self, event):
         if event.type == pygame.QUIT:
@@ -85,8 +89,8 @@ class App:
     
     def on_render(self):
         self._display_surf.fill((0, 0, 0))
-        active_fires = self.bomb_manager.get_all_fire_coords()
 
+        active_fires = self.bomb_manager.get_all_fire_coords()
         self.fires = active_fires
 
         for x in range(self.map.width):
@@ -127,6 +131,34 @@ class App:
                             
                             pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
+        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,0), (self.width,self.height), 1)
+
+        x = self.width + 10
+        y = 15
+        padding = 30
+
+        title = self.font.render("Players", True, (160,160,160))
+        self._display_surf.blit(title, (x,y))
+
+        for player in self.player_manager.players:
+            y += padding
+
+            name_text = player.name
+            name_color = player.color if player.is_alive else (100,100,100)
+
+            hp_text = f"{player.hp}" if player.is_alive else "Exploded"
+            hp_color = (0,160,0) if player.is_alive else (160,0,0)
+
+            name_render = self.font.render(name_text, True, name_color)
+            hp_render = self.font.render(hp_text, True, hp_color)
+
+            self._display_surf.blit(name_render, (x,y))
+            y += 20
+            self._display_surf.blit(hp_render, (x,y))
+        
+        y += padding + 10
+        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,y), (self.width+self.scoreboard,y), 1)
+        
         pygame.display.flip()
 
     def setup(self):
