@@ -8,6 +8,8 @@ from .managers.entity_management.player_manager import PlayerManager
 
 import time
 
+from entities.bot import Bot
+
 BOMB_RANGE = 5
 
 class App:
@@ -186,11 +188,13 @@ class App:
         p3_pos = (1, map.height-2)
         p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
         p3.face_to_dir(1,0)
+        p3.bot_controller = Bot(p3, self.bomb_manager, self.player_manager)
 
         p4_pos = (map.width-2, 1)
         p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
         p4.face_to_dir(-1,0)
-
+        p4.bot_controller = Bot(p4, self.bomb_manager, self.player_manager)
+        
     def _present_champion(self): # Later, this will render a Game Over screen
         print("--------------------------------------")
         print(f"{self.champion.name} is the winner!")
