@@ -16,6 +16,8 @@ class Player:
         self.is_alive: bool = True
         self.hp:int = 5
 
+        self.bot_controller = None
+
     def spawn(self, position):
         x,y = position
         if self.map.is_valid_pixel(x,y):
@@ -101,3 +103,6 @@ class Player:
         if fires:
             if self.position in fires:
                 self.get_damage(1)
+
+        if self.bot_controller and self.is_alive:
+            self.bot_controller.update()
