@@ -56,10 +56,11 @@ class App:
                                 self.setup()
 
                         case "PLAY":
-                            if act["action"] == "BOMBING":
-                                self.bomb_manager.create_bomb(act["player"], act["pos"], BOMB_RANGE)
+                            if self.champion == None:
+                                if act["action"] == "BOMBING":
+                                    self.bomb_manager.create_bomb(act["player"], act["pos"], BOMB_RANGE)
 
-    def on_loop(self):
+    def on_loop(self):  
         self.keyboard_events.on_keyhold()
 
         self.bomb_manager.manage_bombs()

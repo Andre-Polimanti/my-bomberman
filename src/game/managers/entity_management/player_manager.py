@@ -5,7 +5,6 @@ class PlayerManager:
         self.players:list[Player] = []
         self.the_living:list[Player] = []
 
-
     def create_player(self, map, position:tuple[int,int], team:int, name:str):
         player = Player(map, position, team, name)
 
