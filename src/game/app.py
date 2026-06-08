@@ -5,6 +5,7 @@ from game.managers.event_management.keyboard.handler import KeyboardEvents
 
 from .managers.entity_management.bomb_manager import BombManager
 from .managers.entity_management.player_manager import PlayerManager
+from .bot.bot_manager import BotManager
 
 BOMB_RANGE = 5
 
@@ -60,8 +61,14 @@ class App:
                                 if act["action"] == "BOMBING":
                                     self.bomb_manager.create_bomb(act["player"], act["pos"], BOMB_RANGE)
 
-    def on_loop(self):  
+    def on_loop(self):
         self.keyboard_events.on_keyhold()
+
+        if self.champion is None:
+            bot_actions = self.bot_manager.update(self)
+            for act in bot_actions:
+                if act["action"] == "BOMBING":
+                    self.bomb_manager.create_bomb(act["player"], act["pos"], BOMB_RANGE)
 
         self.bomb_manager.manage_bombs()
         self.champion = self.player_manager.manage_players(self.fires)
@@ -105,6 +112,7 @@ class App:
         self.create_players()
 
         self.keyboard_events = KeyboardEvents(self)
+        self.bot_manager = BotManager(self.player_manager.players[2:])
 
     def create_players(self):
         map = self.map
