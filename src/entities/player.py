@@ -76,12 +76,8 @@ class Player:
     def get_damage(self, damage:int = 1, stun_duration:int = 1400):
         if self.stunned:
             return
-
+        
         self.hp -= damage
-        print("--------------------------------------")
-        print(f"{self.name} was hit!")
-        print(f"Remaining HP: {self.hp}")
-        print("--------------------------------------")
         
         if self.hp <= 0: 
             self._die()
@@ -92,9 +88,6 @@ class Player:
     def _die(self):
         self.is_alive = False
         self.map.deoccupy_pixel(self.position[0], self.position[1])
-        print("--------------------------------------")
-        print(f"{self.name} has died!")
-        print("--------------------------------------")
 
     def life_and_death(self, fires):
         self._manage_stun()

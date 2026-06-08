@@ -6,8 +6,6 @@ from game.managers.event_management.keyboard.handler import KeyboardEvents
 from .managers.entity_management.bomb_manager import BombManager
 from .managers.entity_management.player_manager import PlayerManager
 
-import time
-
 BOMB_RANGE = 5
 
 class App:
@@ -66,8 +64,6 @@ class App:
 
         self.bomb_manager.manage_bombs()
         self.champion = self.player_manager.manage_players(self.fires)
-        if self.champion:
-            self._present_champion()
 
     def on_cleanup(self):
         pygame.quit()
@@ -86,10 +82,78 @@ class App:
             clock.tick(60)
             
         self.on_cleanup()
-    
+
     def on_render(self):
         self._display_surf.fill((0, 0, 0))
 
+        self._game_render()
+        self._scoreboard_render()
+
+        if self.champion != None:
+            self._game_over_render()
+        
+        pygame.display.flip()
+
+    def setup(self):
+        self.map = GameMap(15)
+        self.champion = None
+
+        self.player_manager = PlayerManager()
+        self.bomb_manager = BombManager()
+
+        self.create_players()
+
+        self.keyboard_events = KeyboardEvents(self)
+
+    def create_players(self):
+        map = self.map
+
+        p1_pos = (1, 1)
+        p1 = self.player_manager.create_player(map, p1_pos, 1, "Bluey")
+        p1.face_to_dir(1,0)
+
+        p2_pos = (map.width-2, map.height-2)
+        p2 = self.player_manager.create_player(map, p2_pos, 2, "Redy")
+        p2.face_to_dir(-1,0)
+
+        p3_pos = (1, map.height-2)
+        p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
+        p3.face_to_dir(1,0)
+
+        p4_pos = (map.width-2, 1)
+        p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
+        p4.face_to_dir(-1,0)
+
+    def _scoreboard_render(self):
+        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,0), (self.width,self.height), 1)
+
+        x = self.width + 10
+        y = 15
+        padding = 30
+
+        title = self.font.render("Players", True, (160,160,160))
+        self._display_surf.blit(title, (x,y))
+
+        for player in self.player_manager.players:
+            y += padding
+
+            name_text = player.name
+            name_color = player.color if player.is_alive else (100,100,100)
+
+            hp_text = f"{player.hp}" if player.is_alive else "Exploded"
+            hp_color = (0,160,0) if player.is_alive else (160,0,0)
+
+            name_render = self.font.render(name_text, True, name_color)
+            hp_render = self.font.render(hp_text, True, hp_color)
+
+            self._display_surf.blit(name_render, (x,y))
+            y += 20
+            self._display_surf.blit(hp_render, (x,y))
+        
+        y += padding + 10
+        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,y), (self.width+self.scoreboard,y), 1)
+    
+    def _game_render(self):
         active_fires = self.bomb_manager.get_all_fire_coords()
         self.fires = active_fires
 
@@ -131,73 +195,27 @@ class App:
                             
                             pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
 
-        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,0), (self.width,self.height), 1)
+    def _game_over_render(self):
+        pygame.draw.rect(self._display_surf, (0, 0, 0), (0, 0, self.width, self.height))
 
-        x = self.width + 10
-        y = 15
-        padding = 30
+        game_over_text = "Game Over"
 
-        title = self.font.render("Players", True, (160,160,160))
-        self._display_surf.blit(title, (x,y))
+        champ_text = f"The winner is " + self.champion.name
+        champ_color = self.champion.color
 
-        for player in self.player_manager.players:
-            y += padding
+        retry_text = "Type R to restart the game"
 
-            name_text = player.name
-            name_color = player.color if player.is_alive else (100,100,100)
+        game_over_render = self.font.render(game_over_text, True, (255,255,255))
+        champ_render = self.font.render(champ_text, True, champ_color)
+        retry_render = self.font.render(retry_text, True, (127,127,127))
 
-            hp_text = f"{player.hp}" if player.is_alive else "Exploded"
-            hp_color = (0,160,0) if player.is_alive else (160,0,0)
+        mid_x = self.width // 2
+        mid_y = self.height // 2
 
-            name_render = self.font.render(name_text, True, name_color)
-            hp_render = self.font.render(hp_text, True, hp_color)
+        game_over_place = game_over_render.get_rect(center=(mid_x, mid_y-40))
+        champ_place = champ_render.get_rect(center=(mid_x, mid_y))
+        retry_place = retry_render.get_rect(center=(mid_x, mid_y+30))
 
-            self._display_surf.blit(name_render, (x,y))
-            y += 20
-            self._display_surf.blit(hp_render, (x,y))
-        
-        y += padding + 10
-        pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,y), (self.width+self.scoreboard,y), 1)
-        
-        pygame.display.flip()
-
-    def setup(self):
-        self.map = GameMap(15)
-        self.champion = None
-
-        self.player_manager = PlayerManager()
-        self.bomb_manager = BombManager()
-
-        self.create_players()
-
-        self.keyboard_events = KeyboardEvents(self)
-
-    def create_players(self):
-        map = self.map
-
-        p1_pos = (1, 1)
-        p1 = self.player_manager.create_player(map, p1_pos, 1, "Bluey")
-        p1.face_to_dir(1,0)
-
-        p2_pos = (map.width-2, map.height-2)
-        p2 = self.player_manager.create_player(map, p2_pos, 2, "Redy")
-        p2.face_to_dir(-1,0)
-
-        p3_pos = (1, map.height-2)
-        p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
-        p3.face_to_dir(1,0)
-
-        p4_pos = (map.width-2, 1)
-        p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
-        p4.face_to_dir(-1,0)
-
-    def _present_champion(self): # Later, this will render a Game Over screen
-        print("--------------------------------------")
-        print(f"{self.champion.name} is the winner!")
-        print("--------------------------------------")
-
-        time.sleep(3)
-
-        self.setup()
-
-
+        self._display_surf.blit(game_over_render, game_over_place)
+        self._display_surf.blit(champ_render, champ_place)
+        self._display_surf.blit(retry_render, retry_place)
