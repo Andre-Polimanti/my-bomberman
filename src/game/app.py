@@ -52,8 +52,9 @@ class App:
                                 pygame.display.iconify()
 
                         case "GAME_COMMAND":
-                            if act["action"] == "RESTART":
-                                self.setup()
+                            if self.champion:
+                                if act["action"] == "RESTART":
+                                    self.setup()
 
                         case "PLAY":
                             if self.champion == None:
