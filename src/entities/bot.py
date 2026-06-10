@@ -17,8 +17,10 @@ class Bot(Player):
         self.directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
         self.scan_index = 0
         self.flee_steps = 0
-        
-        self.logical_dir = self.facing_dir 
+
+        self.fires = set()
+
+        self.logical_dir = self.facing_dir
         random.shuffle(self.directions)
 
     def get_target_position(self):
@@ -26,76 +28,133 @@ class Bot(Player):
         target_y = self.position[1] + self.logical_dir[1]
         return (target_x, target_y)
 
+    def life_and_death(self, fires):
+        self.fires = fires or set()
+        super().life_and_death(fires)
+
+    def get_valid_target(self):
+        target_pos = super().get_valid_target()
+        if target_pos and target_pos in self.fires:
+            return None
+        return target_pos
+
     def _restart_scan(self):
         self.scan_index = 0
         random.shuffle(self.directions)
         
     def _spray(self, players):
         pos = self.position
-        # Usa logical_dir em vez de facing_dir
         target_pos = (pos[0] + self.logical_dir[0], pos[1] + self.logical_dir[1])
 
         for p in players:
-            if p == self or (p.position[0] == pos[0] or p.position[1] == pos[1]):
+            if p == self or not p.is_alive:
                 continue
-            
+
             dx = p.position[0] - target_pos[0]
             dy = p.position[1] - target_pos[1]
 
             if (dy == 0 and abs(dx) <= self.view_range) or \
                (dx == 0 and abs(dy) <= self.view_range):
-                self.facing_dir = self.logical_dir
+                self.face_to_dir(*self.logical_dir)
                 return True
         return False
+
+    def _detect_presence(self):
+        px, py = self.position
+
+        for dx, dy in self.directions:
+            for step in range(1, self.view_range + 1):
+                x, y = px + dx * step, py + dy * step
+                pixel = self.map.get_pixel(x, y)
+
+                if pixel is None or pixel.obstructed:
+                    break
+                if pixel.occupied:
+                    return (x, y)
+        return None
+
+    def _try_walk_facing(self, now):
+        fx, fy = self.facing_dir
+        fpos = (self.position[0] + fx, self.position[1] + fy)
+        fpixel = self.map.get_pixel(fpos[0], fpos[1])
+
+        if fpixel is None or fpixel.obstructed or fpixel.occupied or fpos in self.fires:
+            return False
+
+        if random.random() >= 0.4:
+            return False
+
+        self.logical_dir = self.facing_dir
+        self.walk()
+        self.next_action_time = now + self.move_delay
+        return True
+
+    def _flee_from(self, danger_pos):
+        px, py = self.position
+        safe_dirs = []
+        other_dirs = []
+
+        for d in self.directions:
+            nx, ny = px + d[0], py + d[1]
+            if nx != danger_pos[0] and ny != danger_pos[1]:
+                safe_dirs.append(d)
+            else:
+                other_dirs.append(d)
+
+        random.shuffle(safe_dirs)
+        random.shuffle(other_dirs)
+        self.directions = safe_dirs + other_dirs
+        self.scan_index = 0
 
     def update(self, players):
         if not self.is_alive or self.stunned:
             return None
-            
+
         now = t.get_ticks()
-        
+
         if now < self.next_action_time:
             return None
 
         dx, dy = self.directions[self.scan_index]
 
-        # Muda apenas a direção LÓGICA (o bot não vira visualmente ainda)
         if self.logical_dir != (dx, dy):
             self.logical_dir = (dx, dy)
             self.next_action_time = now + self.face_delay
             return None
 
-        # Como sobrescrevemos get_target_position, ele usa a logical_dir aqui
         target_pos = self.get_valid_target()
 
         match self.state:
             case "WANDERING":
-                if target_pos:
-                    if self._spray(players):
-                        self.state = "FLEEING"
-                        self.flee_steps = 6
-                        self.next_action_time = now + self.move_delay
-                        
-                        # ATUALIZA O VISUAL: Vira o rosto para soltar a bomba na direção certa
-                        self.face_to_dir(dx, dy) 
-                        
-                        # Prioriza dar meia-volta
-                        oposite_dir = (-dx, -dy)
-                        self.directions.remove(oposite_dir)
-                        self.directions.insert(0, oposite_dir)
-                        self.scan_index = 0 
-                        
-                        return {"type": "PLAY", "action": "BOMBING", "player": self, "pos": target_pos}
+                if target_pos and self._spray(players):
+                    self.state = "FLEEING"
+                    self.flee_steps = 6
+                    self.next_action_time = now + self.move_delay
 
+                    self.face_to_dir(dx, dy)
+                    self._flee_from(target_pos)
+
+                    return {"type": "PLAY", "action": "BOMBING", "player": self, "pos": target_pos}
+
+                presence_pos = self._detect_presence()
+                if presence_pos and random.random() < 0.8:
+                    self.state = "FLEEING"
+                    self.flee_steps = 6
+                    self.next_action_time = now + self.move_delay
+                    self._flee_from(presence_pos)
+                    return None
+
+                if self._try_walk_facing(now):
+                    return None
+
+                if target_pos:
                     if random.random() < 0.5:
-                        # ATUALIZA O VISUAL: Vira o rosto para a direção que vai andar
-                        self.face_to_dir(dx, dy) 
+                        self.face_to_dir(dx, dy)
                         self.walk()
-                        
                         self.next_action_time = now + self.move_delay
-                        self._restart_scan() 
+                        self._restart_scan()
                         return None
-                        
+
                 self.scan_index += 1
                 if self.scan_index >= 4:
                     self._restart_scan()
@@ -103,7 +162,6 @@ class Bot(Player):
 
             case "FLEEING":
                 if target_pos:
-                    # ATUALIZA O VISUAL: Vira o rosto e corre em linha reta
                     self.face_to_dir(dx, dy) 
                     self.walk()
                     

@@ -117,7 +117,7 @@ class App:
         map = self.map
 
         p1_pos = (1, 1)
-        p1 = self.player_manager.create_player(map, p1_pos, 1, "Bluey")
+        p1 = self.player_manager.create_bot(map, p1_pos, 1, "Bluey")
         p1.face_to_dir(1,0)
 
         p2_pos = (map.width-2, map.height-2)
