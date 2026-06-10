@@ -1,4 +1,5 @@
 from entities.player import Player
+from entities.bot import Bot
 
 class PlayerManager:
     def __init__(self):
@@ -12,6 +13,14 @@ class PlayerManager:
         self.the_living.append(player)
 
         return player
+    
+    def create_bot(self, map, position:tuple[int,int], team:int, name:str):
+        bot = Bot(map, position, team, name)
+        
+        self.players.append(bot)
+        self.the_living.append(bot)
+        
+        return bot
         
     def manage_players(self, fires):
         for player in self.players:

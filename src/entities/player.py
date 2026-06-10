@@ -94,3 +94,5 @@ class Player:
         if fires:
             if self.position in fires:
                 self.get_damage(1)
+
+    def update(self, players): return None

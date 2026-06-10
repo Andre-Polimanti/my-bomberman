@@ -64,6 +64,12 @@ class App:
     def on_loop(self):  
         self.keyboard_events.on_keyhold()
 
+        for player in self.player_manager.players:
+            if player.is_alive:
+                action = player.update(self.player_manager.players)
+                if action and action["type"] == "PLAY" and action["action"] == "BOMBING":
+                    self.bomb_manager.create_bomb(action["player"], action["pos"], BOMB_RANGE)
+
         self.bomb_manager.manage_bombs()
         self.champion = self.player_manager.manage_players(self.fires)
 
@@ -119,11 +125,11 @@ class App:
         p2.face_to_dir(-1,0)
 
         p3_pos = (1, map.height-2)
-        p3 = self.player_manager.create_player(map, p3_pos, 3, "Yellowy")
+        p3 = self.player_manager.create_bot(map, p3_pos, 3, "Yellowy")
         p3.face_to_dir(1,0)
 
         p4_pos = (map.width-2, 1)
-        p4 = self.player_manager.create_player(map, p4_pos, 4, "Cyany")
+        p4 = self.player_manager.create_bot(map, p4_pos, 4, "Cyany")
         p4.face_to_dir(-1,0)
 
     def _scoreboard_render(self):
