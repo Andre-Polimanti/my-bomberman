@@ -6,6 +6,9 @@ from game.managers.event_management.keyboard.handler import KeyboardEvents
 from .managers.entity_management.bomb_manager import BombManager
 from .managers.entity_management.player_manager import PlayerManager
 
+from game.configs.game_modes import only_bots, single_player, local
+
+
 BOMB_RANGE = 5
 
 class App:
@@ -71,7 +74,10 @@ class App:
                     self.bomb_manager.create_bomb(action["player"], action["pos"], BOMB_RANGE)
 
         self.bomb_manager.manage_bombs()
-        self.champion = self.player_manager.manage_players(self.fires)
+
+        current_status = self.player_manager.manage_players(self.fires)
+        if self.champion is None and current_status is not None:
+            self.champion = current_status
 
     def on_cleanup(self):
         pygame.quit()
@@ -101,36 +107,6 @@ class App:
             self._game_over_render()
         
         pygame.display.flip()
-
-    def setup(self):
-        self.map = GameMap(15)
-        self.champion = None
-
-        self.player_manager = PlayerManager()
-        self.bomb_manager = BombManager()
-
-        self.create_players()
-
-        self.keyboard_events = KeyboardEvents(self)
-
-    def create_players(self):
-        map = self.map
-
-        p1_pos = (1, 1)
-        p1 = self.player_manager.create_bot(map, p1_pos, 1, "Bluey")
-        p1.face_to_dir(1,0)
-
-        p2_pos = (map.width-2, map.height-2)
-        p2 = self.player_manager.create_player(map, p2_pos, 2, "Redy")
-        p2.face_to_dir(-1,0)
-
-        p3_pos = (1, map.height-2)
-        p3 = self.player_manager.create_bot(map, p3_pos, 3, "Yellowy")
-        p3.face_to_dir(1,0)
-
-        p4_pos = (map.width-2, 1)
-        p4 = self.player_manager.create_bot(map, p4_pos, 4, "Cyany")
-        p4.face_to_dir(-1,0)
 
     def _scoreboard_render(self):
         pygame.draw.line(self._display_surf, (255, 255, 255), (self.width,0), (self.width,self.height), 1)
@@ -208,8 +184,13 @@ class App:
 
         game_over_text = "Game Over"
 
-        champ_text = f"The winner is " + self.champion.name
-        champ_color = self.champion.color
+        if self.champion == "DRAW":
+
+            champ_text = "DRAW - All of the living died in the same time."
+            champ_color = (180, 180, 180)
+        else:
+            champ_text = f"The winner is " + self.champion.name
+            champ_color = self.champion.color
 
         retry_text = "Type R to restart the game"
 
@@ -227,3 +208,16 @@ class App:
         self._display_surf.blit(game_over_render, game_over_place)
         self._display_surf.blit(champ_render, champ_place)
         self._display_surf.blit(retry_render, retry_place)
+
+    def setup(self):
+        self.map = GameMap(15)
+        self.champion = None
+
+        self.player_manager = PlayerManager()
+        self.bomb_manager = BombManager()
+
+        only_bots(self)
+        #single_player(self)
+        #local(self)
+
+        self.keyboard_events = KeyboardEvents(self)

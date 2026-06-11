@@ -48,5 +48,8 @@ class PlayerManager:
 
     def _check_for_winner(self):
         if len(self.the_living) == 1:
+            self.game_won = True
             return self.the_living[0]
+        elif len(self.the_living) == 0:
+            return "DRAW"
         return None
