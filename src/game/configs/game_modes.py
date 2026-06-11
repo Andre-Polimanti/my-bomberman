@@ -2,55 +2,55 @@ def only_bots(app):
     map = app.map
 
     p1_pos = (1, 1)
-    p1 = app.player_manager.create_bot(map, p1_pos, 1, "Bluey")
+    p1 = app.player_manager.create_bot(map, p1_pos, 1, "Cocô")
     p1.face_to_dir(1,0)
 
     p2_pos = (map.width-2, map.height-2)
-    p2 = app.player_manager.create_bot(map, p2_pos, 2, "Redy")
+    p2 = app.player_manager.create_bot(map, p2_pos, 2, "Bunda")
     p2.face_to_dir(-1,0)
 
     p3_pos = (1, map.height-2)
-    p3 = app.player_manager.create_bot(map, p3_pos, 3, "Yellowy")
+    p3 = app.player_manager.create_bot(map, p3_pos, 3, "Xixi")
     p3.face_to_dir(1,0)
 
     p4_pos = (map.width-2, 1)
-    p4 = app.player_manager.create_bot(map, p4_pos, 4, "Cyany")
+    p4 = app.player_manager.create_bot(map, p4_pos, 4, "Pinto")
     p4.face_to_dir(-1,0)
 
 def single_player(app):
     map = app.map
 
     p1_pos = (1, 1)
-    p1 = app.player_manager.create_player(map, p1_pos, 1, "Bluey")
+    p1 = app.player_manager.create_player(map, p1_pos, 1, "You")
     p1.face_to_dir(1,0)
 
     p2_pos = (map.width-2, map.height-2)
-    p2 = app.player_manager.create_bot(map, p2_pos, 2, "Redy")
+    p2 = app.player_manager.create_bot(map, p2_pos, 2, "BOT_N1")
     p2.face_to_dir(-1,0)
 
     p3_pos = (1, map.height-2)
-    p3 = app.player_manager.create_bot(map, p3_pos, 3, "Yellowy")
+    p3 = app.player_manager.create_bot(map, p3_pos, 3, "BOT_N2")
     p3.face_to_dir(1,0)
 
     p4_pos = (map.width-2, 1)
-    p4 = app.player_manager.create_bot(map, p4_pos, 4, "Cyany")
+    p4 = app.player_manager.create_bot(map, p4_pos, 4, "Caronte")
     p4.face_to_dir(-1,0)
 
 def local(app):
     map = app.map
 
     p1_pos = (1, 1)
-    p1 = app.player_manager.create_player(map, p1_pos, 1, "Bluey")
+    p1 = app.player_manager.create_player(map, p1_pos, 1, "Player_1")
     p1.face_to_dir(1,0)
 
     p2_pos = (map.width-2, map.height-2)
-    p2 = app.player_manager.create_player(map, p2_pos, 2, "Redy")
+    p2 = app.player_manager.create_player(map, p2_pos, 2, "Player_2")
     p2.face_to_dir(-1,0)
 
     p3_pos = (1, map.height-2)
-    p3 = app.player_manager.create_bot(map, p3_pos, 3, "Yellowy")
+    p3 = app.player_manager.create_bot(map, p3_pos, 3, "BOT_N1")
     p3.face_to_dir(1,0)
 
     p4_pos = (map.width-2, 1)
-    p4 = app.player_manager.create_bot(map, p4_pos, 4, "Cyany")
+    p4 = app.player_manager.create_bot(map, p4_pos, 4, "BOT_N2")
     p4.face_to_dir(-1,0)

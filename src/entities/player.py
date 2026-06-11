@@ -1,4 +1,5 @@
 from pygame import time as t
+import pygame
 
 from core.map import GameMap
 
@@ -11,7 +12,9 @@ class Player:
         self.spawn(position)
 
         self.face_to_dir(0,1)
+
         self.set_color()
+        self.load_sprites()
 
         self.is_alive: bool = True
         self.hp:int = 5
@@ -59,13 +62,13 @@ class Player:
     def set_color(self):
         match self.team:
             case 1:
-                self.color = (0,0,255)
+                self.color = (32,32,159)
             case 2:
-                self.color = (255,0,0)
+                self.color = (159,32,32)
             case 3:
-                self.color = (255,255,0)
+                self.color = (32,159,32)
             case 4:
-                self.color = (0,255,255)
+                self.color = (159,32,159)
             case _:
                 self.color = (159,159,159)
 
@@ -96,3 +99,24 @@ class Player:
                 self.get_damage(1)
 
     def update(self, players): return None
+
+    def load_sprites(self, block_size=60):
+        self.sprites = {}
+        
+        directions = {
+            (0, 1): "front",
+            (0, -1): "back",
+            (1, 0): "right",
+            (-1, 0): "left"
+        }
+        
+        base_path = f"assets/player_{self.team}"
+        
+        for dir_tuple, name in directions.items():
+            path = f"{base_path}/{name}.png"
+            
+            img = pygame.image.load(path).convert_alpha()
+            self.sprites[dir_tuple] = pygame.transform.scale(img, (block_size, block_size))
+
+    def get_current_sprite(self):
+        return self.sprites.get(self.facing_dir, self.sprites[(0, 1)])

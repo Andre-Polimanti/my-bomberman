@@ -9,11 +9,11 @@ FLEE_CHANCE = 0.8
 WALK_CHANCE = 0.5
 WALK_AHEAD_CHANCE = 0.4
 
-MOVE_DELAY = 10
-LOOK_DELAY = 25
+# MOVE_DELAY = 10
+# LOOK_DELAY = 25
 
-#MOVE_DELAY = 150
-#LOOK_DELAY = 50
+MOVE_DELAY = 150
+LOOK_DELAY = 50
 
 class Bot(Player):
     def __init__(self, map, position, team, name):

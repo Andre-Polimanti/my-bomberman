@@ -38,6 +38,13 @@ class App:
         pygame.font.init()
         self.font = pygame.font.SysFont('arial', 20, bold = True)
 
+        self.sprites = {
+            "floor": self._load_sprite("assets/floor.png"),
+            "wall": self._load_sprite("assets/wall.png"),
+            "bomb": self._load_sprite("assets/bomb.png"),
+            "fire": self._load_sprite("assets/fire.png"),
+        }
+
         self.setup()
 
     def on_event(self, event):
@@ -125,7 +132,7 @@ class App:
             name_color = player.color if player.is_alive else (100,100,100)
 
             hp_text = f"{player.hp}" if player.is_alive else "Exploded"
-            hp_color = (0,160,0) if player.is_alive else (160,0,0)
+            hp_color = (0,160,0) if player.is_alive else (155,155,31)
 
             name_render = self.font.render(name_text, True, name_color)
             hp_render = self.font.render(hp_text, True, hp_color)
@@ -143,41 +150,29 @@ class App:
 
         for x in range(self.map.width):
             for y in range(self.map.height):
+                color = None 
+
                 pixel = self.map.get_pixel(x, y)
                 rect = pygame.Rect(x * self.BLOCK_SIZE, y * self.BLOCK_SIZE, self.BLOCK_SIZE, self.BLOCK_SIZE)
                 
-                if pixel.obstructed:
-                    color = (128, 128, 128)
-                elif (x, y) in active_fires:
-                    color = (255, 69, 0)
-                else:
-                    color = (34, 139, 34)
+                self._display_surf.blit(self.sprites["floor"], rect)
                 
-                for player in self.player_manager.players:
-                    if player.is_alive:
-                        if (x,y) == player.position:
-                            color = player.color
+                if pixel.obstructed:
+                    self._display_surf.blit(self.sprites["wall"], rect)
+                elif (x, y) in active_fires:
+                    self._display_surf.blit(self.sprites["fire"], rect)
+                    
                 for bomb in self.bomb_manager.active_bombs:
                     if (x,y) == bomb.position and bomb.state == "TICKING":
-                        color = (0,0,0)
-                
-                pygame.draw.rect(self._display_surf, color, rect)          
-                pygame.draw.rect(self._display_surf, (20, 20, 20), rect, 1)
+                        self._display_surf.blit(self.sprites["bomb"], rect)
 
                 for player in self.player_manager.players:
-                    if player.is_alive:
-                        if (x, y) == player.position:
-                            cx = x * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
-                            cy = y * self.BLOCK_SIZE + self.BLOCK_SIZE // 2
-                            
-                            dx, dy = player.facing_dir
-                            
-                            tip = (cx + dx * 15, cy + dy * 15)
-                            
-                            left_base = (cx + dy * 8, cy - dx * 8)
-                            right_base = (cx - dy * 8, cy + dx * 8)
-                            
-                            pygame.draw.polygon(self._display_surf, (255, 255, 255), [tip, left_base, right_base])
+                    if player.is_alive and (x, y) == player.position:
+                        current_sprite = player.get_current_sprite()
+                        self._display_surf.blit(current_sprite, rect)
+                
+                if color is not None:
+                    pygame.draw.rect(self._display_surf, color, rect)          
 
     def _game_over_render(self):
         pygame.draw.rect(self._display_surf, (0, 0, 0), (0, 0, self.width, self.height))
@@ -221,3 +216,7 @@ class App:
         #local(self)
 
         self.keyboard_events = KeyboardEvents(self)
+
+    def _load_sprite(self, path):
+        image = pygame.image.load(path).convert_alpha()
+        return pygame.transform.scale(image, (self.BLOCK_SIZE, self.BLOCK_SIZE))
